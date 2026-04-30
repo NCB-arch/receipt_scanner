@@ -357,17 +357,31 @@ function doSave() {
   document.getElementById('processing').classList.add('show');
   document.getElementById('resultCard').classList.remove('show');
 
-  // Use fetch without mode:no-cors so we can read the response
-  // Apps Script handles CORS when deployed as "Anyone" web app
+  // Use hidden iframe + form to bypass CORS entirely
+  // Apps Script receives a normal form POST, no preflight needed
   var payload = JSON.stringify({ sheetName: sheetName, headers: headers, row: row });
 
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: payload
-  })
-  .then(function(res) { return res.text(); })
-  .then(function(text) {
+  var iframeId = 'hiddenFrame_' + Date.now();
+  var iframe = document.createElement('iframe');
+  iframe.id = iframeId;
+  iframe.name = iframeId;
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = url;
+  form.target = iframeId;
+  form.style.display = 'none';
+
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'payload';
+  input.value = payload;
+  form.appendChild(input);
+  document.body.appendChild(form);
+
+  iframe.onload = function() {
     document.getElementById('processing').classList.remove('show');
     document.getElementById('resultCard').classList.add('show');
     saveBtn.disabled = false;
@@ -377,18 +391,12 @@ function doSave() {
     try { localStorage.setItem('scanHistory', JSON.stringify(scanHistory.slice(0, 50))); } catch(x) {}
     renderHistory();
     showToast('Saved to ' + sheetName, 'ok');
-  })
-  .catch(function(err) {
-    document.getElementById('processing').classList.remove('show');
-    document.getElementById('resultCard').classList.add('show');
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Save to Sheets';
-    showToast('Save failed: ' + err.message, 'err');
-    var entry = { id: Date.now(), type: label, status: 'err' };
-    scanHistory.unshift(entry);
-    try { localStorage.setItem('scanHistory', JSON.stringify(scanHistory.slice(0, 50))); } catch(x) {}
-    renderHistory();
-  });
+    setTimeout(function() {
+      try { document.body.removeChild(iframe); document.body.removeChild(form); } catch(x) {}
+    }, 3000);
+  };
+
+  form.submit();
 }
 
 function renderHistory() {

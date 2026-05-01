@@ -362,7 +362,7 @@ body {
 </div>
 
 <div class="config-bar">
-  <input type="text" id="r2Url" placeholder="R2 public URL — https://pub-xxx.r2.dev" />
+  <input type="text" id="r2Url" placeholder="Worker URL — https://nalanda-sheets-proxy.nalandaconcreteblocks.workers.dev" />
   <button class="btn-load" onclick="loadDocs()">Load</button>
 </div>
 
@@ -422,7 +422,7 @@ var currentMonth = "all";
 var lbIndex = 0;
 
 window.onload = function() {
-  var saved = localStorage.getItem("nalanda_r2_url");
+  var saved = localStorage.getItem("nalanda_worker_url");
   if (saved) {
     document.getElementById("r2Url").value = saved;
     R2_URL = saved;
@@ -437,20 +437,19 @@ async function loadDocs() {
   if (!url) { alert("Enter your R2 public URL first"); return; }
   if (!url.startsWith("http")) url = "https://" + url;
   R2_URL = url.replace(/\/$/, "");
-  localStorage.setItem("nalanda_r2_url", R2_URL);
+  localStorage.setItem("nalanda_worker_url", R2_URL);
 
   showLoading();
   try {
-    // Fetch listing — R2 S3-compatible XML listing
-    const res = await fetch(R2_URL + "/?list-type=2&max-keys=1000");
-    if (!res.ok) throw new Error("Could not list bucket — check public URL");
-    const text = await res.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, "application/xml");
-    const keys = Array.from(xml.querySelectorAll("Key")).map(k => k.textContent);
+    // Fetch listing from Worker /list endpoint
+    const res = await fetch(R2_URL + "/list");
+    if (!res.ok) throw new Error("Could not reach Worker — check URL");
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const keys = (data.keys || []).map(k => k.key);
 
     if (keys.length === 0) {
-      showEmpty("No documents found in bucket yet");
+      showEmpty("No documents found yet — send some images to the bot first!");
       return;
     }
 
@@ -472,7 +471,7 @@ function parseKey(key) {
   const docType = parts[0];
   const month   = parts[1];
   const filename = parts.slice(2).join("/");
-  return { key, docType, month, filename, url: R2_URL + "/" + encodeURIComponent(key).replace(/%2F/g, "/") };
+  return { key, docType, month, filename, url: R2_URL + "/img?key=" + encodeURIComponent(key) };
 }
 
 function getTypeClass(docType) {

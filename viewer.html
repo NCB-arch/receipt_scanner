@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nalanda Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0d;
+  --surface: #1a1a16;
+  --surface2: #232320;
+  --border: #2e2e28;
+  --text: #f0ede6;
+  --text2: #9a9690;
+  --text3: #5a5a52;
+  --accent: #e8c84a;
+  --accent2: #c4a832;
+  --green: #4aaa6e;
+  --blue: #4a8be8;
+  --orange: #e87a4a;
+  --purple: #9b6ae8;
+  --r: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
+  gap: 16px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: #000;
+}
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+.logo-sub { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 1px; }
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+.total-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  background: var(--surface2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+/* Config bar */
+.config-bar {
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.config-bar input {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  outline: none;
+}
+.config-bar input:focus { border-color: var(--accent); }
+.config-bar input::placeholder { color: var(--text3); }
+.btn-load {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-load:active { opacity: 0.8; }
+
+/* Filters */
+.filters {
+  padding: 16px 24px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.filter-label { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-right: 4px; }
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab:hover { border-color: var(--text2); color: var(--text); }
+.tab.active { color: #000; border-color: transparent; }
+.tab.t-all.active    { background: var(--accent); }
+.tab.t-bharathi.active { background: var(--green); }
+.tab.t-nalanda.active  { background: var(--blue); }
+.tab.t-mr.active       { background: var(--orange); }
+.tab.t-delivery.active { background: var(--purple); }
+
+.month-select {
+  padding: 6px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+  margin-left: auto;
+}
+.month-select option { background: var(--surface2); }
+
+/* Grid */
+.grid-wrap { padding: 20px 24px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.doc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  position: relative;
+}
+.doc-card:hover { transform: translateY(-2px); border-color: var(--text3); }
+.doc-card:active { transform: scale(0.98); }
+
+.doc-thumb {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+  background: var(--surface2);
+}
+.doc-thumb-placeholder {
+  width: 100%;
+  aspect-ratio: 3/4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  background: var(--surface2);
+  color: var(--text3);
+}
+
+.doc-info {
+  padding: 8px 10px;
+}
+.doc-type {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+  font-family: 'DM Mono', monospace;
+}
+.doc-type.t-bharathi { color: var(--green); }
+.doc-type.t-nalanda  { color: var(--blue); }
+.doc-type.t-mr       { color: var(--orange); }
+.doc-type.t-delivery { color: var(--purple); }
+
+.doc-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-date {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  margin-top: 2px;
+}
+
+/* Empty state */
+.empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty p { font-size: 14px; }
+.empty small { font-size: 12px; font-family: 'DM Mono', monospace; margin-top: 4px; display: block; }
+
+/* Loading */
+.loading {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox.show { display: flex; }
+.lightbox-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+}
+.lightbox-title { font-size: 13px; font-weight: 600; color: #fff; }
+.lightbox-meta { font-size: 11px; color: rgba(255,255,255,0.5); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.lb-close {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.lb-close:hover { background: rgba(255,255,255,0.2); }
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.lightbox-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+.lb-btn {
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  border-radius: 20px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.lb-btn:hover { background: rgba(255,255,255,0.2); }
+.lb-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.lb-counter {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Stats bar */
+.stats {
+  display: flex;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.stat-val { font-size: 18px; font-weight: 800; color: var(--accent); }
+.stat-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">N</div>
+    <div>
+      <div class="logo-text">Nalanda Docs</div>
+      <div class="logo-sub">DOCUMENT VIEWER</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="total-badge" id="totalBadge">0 docs</div>
+  </div>
+</div>
+
+<div class="config-bar">
+  <input type="text" id="r2Url" placeholder="R2 public URL — https://pub-xxx.r2.dev" />
+  <button class="btn-load" onclick="loadDocs()">Load</button>
+</div>
+
+<div class="stats" id="stats" style="display:none">
+  <div class="stat"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--green)" id="statBharathi">0</div><div class="stat-label">Bharathi</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--blue)" id="statNalanda">0</div><div class="stat-label">Nalanda</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--orange)" id="statMR">0</div><div class="stat-label">MR Ent.</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--purple)" id="statDelivery">0</div><div class="stat-label">Delivery</div></div>
+</div>
+
+<div class="filters" id="filterBar" style="display:none">
+  <span class="filter-label">TYPE</span>
+  <button class="tab t-all active" onclick="setType('all', this)">All</button>
+  <button class="tab t-bharathi" onclick="setType('Bharathi Invoices', this)">Bharathi</button>
+  <button class="tab t-nalanda"  onclick="setType('Nalanda Weighment Slips', this)">Nalanda</button>
+  <button class="tab t-mr"       onclick="setType('MR Enterprises', this)">MR Ent.</button>
+  <button class="tab t-delivery" onclick="setType('Delivery Challans', this)">Delivery</button>
+  <select class="month-select" id="monthSelect" onchange="filterDocs()">
+    <option value="all">All months</option>
+  </select>
+</div>
+
+<div class="grid-wrap">
+  <div class="grid" id="grid">
+    <div class="empty">
+      <div class="empty-icon">📁</div>
+      <p>Enter your R2 public URL above</p>
+      <small>https://pub-xxx.r2.dev</small>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-header">
+    <div>
+      <div class="lightbox-title" id="lbTitle"></div>
+      <div class="lightbox-meta" id="lbMeta"></div>
+    </div>
+    <button class="lb-close" onclick="closeLightboxBtn()">×</button>
+  </div>
+  <img class="lightbox-img" id="lbImg" src="" alt="">
+  <div class="lightbox-nav">
+    <button class="lb-btn" id="lbPrev" onclick="lbNav(-1)">← Prev</button>
+    <span class="lb-counter" id="lbCounter"></span>
+    <button class="lb-btn" id="lbNext" onclick="lbNav(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+var R2_URL = "";
+var allDocs = [];
+var filtered = [];
+var currentType = "all";
+var currentMonth = "all";
+var lbIndex = 0;
+
+window.onload = function() {
+  var saved = localStorage.getItem("nalanda_r2_url");
+  if (saved) {
+    document.getElementById("r2Url").value = saved;
+    R2_URL = saved;
+    loadDocs();
+  }
+};
+
+// ── Load docs from R2 ──────────────────────────────────
+// R2 public buckets support listing via ?list-type=2
+async function loadDocs() {
+  var url = document.getElementById("r2Url").value.trim();
+  if (!url) { alert("Enter your R2 public URL first"); return; }
+  if (!url.startsWith("http")) url = "https://" + url;
+  R2_URL = url.replace(/\/$/, "");
+  localStorage.setItem("nalanda_r2_url", R2_URL);
+
+  showLoading();
+  try {
+    // Fetch listing — R2 S3-compatible XML listing
+    const res = await fetch(R2_URL + "/?list-type=2&max-keys=1000");
+    if (!res.ok) throw new Error("Could not list bucket — check public URL");
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, "application/xml");
+    const keys = Array.from(xml.querySelectorAll("Key")).map(k => k.textContent);
+
+    if (keys.length === 0) {
+      showEmpty("No documents found in bucket yet");
+      return;
+    }
+
+    allDocs = keys.map(key => parseKey(key)).filter(d => d !== null);
+    buildMonthFilter();
+    updateStats();
+    filterDocs();
+    document.getElementById("filterBar").style.display = "flex";
+    document.getElementById("stats").style.display = "flex";
+  } catch(e) {
+    showEmpty("Error: " + e.message);
+  }
+}
+
+function parseKey(key) {
+  // Format: DocType/Month-Year/filename.jpg
+  const parts = key.split("/");
+  if (parts.length < 3) return null;
+  const docType = parts[0];
+  const month   = parts[1];
+  const filename = parts.slice(2).join("/");
+  return { key, docType, month, filename, url: R2_URL + "/" + encodeURIComponent(key).replace(/%2F/g, "/") };
+}
+
+function getTypeClass(docType) {
+  if (docType.includes("Bharathi")) return "t-bharathi";
+  if (docType.includes("Nalanda"))  return "t-nalanda";
+  if (docType.includes("MR"))       return "t-mr";
+  if (docType.includes("Delivery")) return "t-delivery";
+  return "t-bharathi";
+}
+
+function getTypeShort(docType) {
+  if (docType.includes("Bharathi")) return "Bharathi Invoice";
+  if (docType.includes("Nalanda"))  return "Nalanda Weigh Slip";
+  if (docType.includes("MR"))       return "MR Enterprises";
+  if (docType.includes("Delivery")) return "Delivery Challan";
+  return docType;
+}
+
+function getTypeEmoji(docType) {
+  if (docType.includes("Bharathi")) return "🧾";
+  if (docType.includes("Nalanda"))  return "⚖️";
+  if (docType.includes("MR"))       return "📝";
+  if (docType.includes("Delivery")) return "🚛";
+  return "📄";
+}
+
+function buildMonthFilter() {
+  var months = [...new Set(allDocs.map(d => d.month))].sort().reverse();
+  var sel = document.getElementById("monthSelect");
+  sel.innerHTML = '<option value="all">All months</option>';
+  months.forEach(function(m) {
+    var opt = document.createElement("option");
+    opt.value = m; opt.textContent = m;
+    sel.appendChild(opt);
+  });
+}
+
+function updateStats() {
+  document.getElementById("statTotal").textContent = allDocs.length;
+  document.getElementById("statBharathi").textContent = allDocs.filter(d => d.docType.includes("Bharathi")).length;
+  document.getElementById("statNalanda").textContent  = allDocs.filter(d => d.docType.includes("Nalanda")).length;
+  document.getElementById("statMR").textContent       = allDocs.filter(d => d.docType.includes("MR")).length;
+  document.getElementById("statDelivery").textContent = allDocs.filter(d => d.docType.includes("Delivery")).length;
+  document.getElementById("totalBadge").textContent   = allDocs.length + " docs";
+}
+
+function setType(type, btn) {
+  currentType = type;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  filterDocs();
+}
+
+function filterDocs() {
+  currentMonth = document.getElementById("monthSelect").value;
+  filtered = allDocs.filter(function(d) {
+    var typeOk = currentType === "all" || d.docType === currentType;
+    var monthOk = currentMonth === "all" || d.month === currentMonth;
+    return typeOk && monthOk;
+  });
+  renderGrid();
+}
+
+function renderGrid() {
+  var grid = document.getElementById("grid");
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>No documents match filters</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(function(doc, i) {
+    var tc = getTypeClass(doc.docType);
+    var ts = getTypeShort(doc.docType);
+    var name = doc.filename.replace(/\.[^.]+$/, "").replace(/_/g, " ");
+    var dateMatch = doc.filename.match(/(\d{2}-\d{2}-\d{4})/);
+    var date = dateMatch ? dateMatch[1] : doc.month;
+    return '<div class="doc-card" onclick="openLightbox(' + i + ')">' +
+      '<img class="doc-thumb" src="' + doc.url + '" alt="' + name + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+      '<div class="doc-thumb-placeholder" style="display:none">' + getTypeEmoji(doc.docType) + '</div>' +
+      '<div class="doc-info">' +
+        '<div class="doc-type ' + tc + '">' + ts + '</div>' +
+        '<div class="doc-name">' + name + '</div>' +
+        '<div class="doc-date">' + date + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+
+// ── Lightbox ───────────────────────────────────────────
+function openLightbox(i) {
+  lbIndex = i;
+  showLb();
+  document.getElementById("lightbox").classList.add("show");
+}
+
+function showLb() {
+  var doc = filtered[lbIndex];
+  var name = doc.filename.replace(/\.[^.]+$/, "").replace(/_/g, " ");
+  document.getElementById("lbImg").src = doc.url;
+  document.getElementById("lbTitle").textContent = getTypeShort(doc.docType);
+  document.getElementById("lbMeta").textContent = name + " · " + doc.month;
+  document.getElementById("lbCounter").textContent = (lbIndex + 1) + " / " + filtered.length;
+  document.getElementById("lbPrev").disabled = lbIndex === 0;
+  document.getElementById("lbNext").disabled = lbIndex === filtered.length - 1;
+}
+
+function lbNav(dir) {
+  lbIndex = Math.max(0, Math.min(filtered.length - 1, lbIndex + dir));
+  showLb();
+}
+
+function closeLightbox(e) {
+  if (e.target === document.getElementById("lightbox")) {
+    document.getElementById("lightbox").classList.remove("show");
+  }
+}
+function closeLightboxBtn() {
+  document.getElementById("lightbox").classList.remove("show");
+}
+
+document.addEventListener("keydown", function(e) {
+  var lb = document.getElementById("lightbox");
+  if (!lb.classList.contains("show")) return;
+  if (e.key === "ArrowRight") lbNav(1);
+  if (e.key === "ArrowLeft")  lbNav(-1);
+  if (e.key === "Escape") lb.classList.remove("show");
+});
+
+// ── Helpers ────────────────────────────────────────────
+function showLoading() {
+  document.getElementById("grid").innerHTML =
+    '<div class="loading"><div class="spinner"></div><p style="font-size:13px">Loading documents...</p></div>';
+}
+
+function showEmpty(msg) {
+  document.getElementById("grid").innerHTML =
+    '<div class="empty"><div class="empty-icon">📭</div><p>' + msg + '</p></div>';
+}
+</script>
+</body>
+</html>
